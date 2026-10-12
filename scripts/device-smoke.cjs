@@ -16,7 +16,7 @@ const fs = require('node:fs'),
     errors = [];
   ws.onmessage = (e) => {
     let m = JSON.parse(e.data);
-    if (m.method === 'Runtime.exceptionThrown') errors.push(m.params.exceptionDetails.text);
+    if (m.method === 'Runtime.exceptionThrown') errors.push(m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text);
     if (pending.has(m.id)) {
       const p = pending.get(m.id);
       pending.delete(m.id);
@@ -190,7 +190,7 @@ const fs = require('node:fs'),
     await evalJS(`state.pro=${proBefore};reportDays=30;close()`);
     await evalJS('refresh();go("home")');
     assert.equal(await evalJS('window.scrollY'), 0);
-    assert.equal(errors.length, 0, 'no JavaScript exceptions');
+    assert.equal(errors.length, 0, 'no JavaScript exceptions: ' + errors.join('\n'));
     if (process.argv.includes('--screenshot')) {
       const shot = await call('Page.captureScreenshot', { format: 'png' });
       fs.mkdirSync('artifacts', { recursive: true });

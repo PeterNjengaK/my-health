@@ -60,4 +60,3 @@ settings = function () {
     `<div class="notice">My Health is a personal wellness journal, not a medical device. It does not diagnose, prevent, cure or treat medical conditions. Consult a qualified healthcare professional for medical advice.</div>`
   );
 };
-render();

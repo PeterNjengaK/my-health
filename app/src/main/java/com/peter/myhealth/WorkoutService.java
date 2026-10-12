@@ -253,8 +253,9 @@ public class WorkoutService extends Service implements LocationListener {
         .setContentText(
             String.format(
                 java.util.Locale.getDefault(),
-                "%.2f km · %d min",
-                w.optDouble("distance") / 1000,
+                "%.2f %s · %d min",
+                w.optDouble("distance") / (Store.data(this).optString("distanceUnit").equals("mi") ? 1609.344 : 1000),
+                Store.data(this).optString("distanceUnit").equals("mi") ? "mi" : "km",
                 w.optLong("elapsed") / 60000))
         .setContentIntent(open)
         .addAction(new Notification.Action.Builder(null, "Finish", stop).build())

@@ -437,6 +437,14 @@ public class MainActivity extends Activity {
               || goals.getDouble("sleep") > 24
               || next.getDouble("stride") < 0.2
               || next.getDouble("stride") > 2) return "Check your goals and stride length";
+          String wu = next.optString("weightUnit", d.optString("weightUnit", "kg"));
+          String du = next.optString("distanceUnit", d.optString("distanceUnit", "km"));
+          double bw = next.optDouble("bodyWeightKg", d.optDouble("bodyWeightKg", 0));
+          if (!(wu.equals("kg") || wu.equals("lbs")) || !(du.equals("km") || du.equals("mi"))
+              || !Double.isFinite(bw) || bw < 0 || bw > 700) return "Check your units and body weight";
+          d.put("weightUnit", wu);
+          d.put("distanceUnit", du);
+          d.put("bodyWeightKg", bw);
           d.put("goals", goals);
           d.put("name", next.getString("name"));
           d.put("stride", next.getDouble("stride"));

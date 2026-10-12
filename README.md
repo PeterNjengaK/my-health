@@ -110,3 +110,9 @@ Set `PLAY_BILLING_PUBLIC_KEY`, `PRIVACY_POLICY_URL`, `SUPPORT_EMAIL`, and `PUBLI
 `app/src/main/java/com/peter/myhealth/` contains Android integrations, validation and step math. `app/src/main/assets/` contains the offline interface and v2 UI. `tests/`, `app/src/androidTest/` and `scripts/` contain repeatable checks. Build outputs, local SDK configuration, screenshots, backups, reports and signing keys are excluded from Git.
 
 Implementation references: [Android Health Connect platform API](https://developer.android.com/reference/android/health/connect/HealthConnectManager), [ZXing Android Embedded](https://github.com/journeyapps/zxing-android-embedded), and [Open Food Facts API](https://openfoodfacts.github.io/openfoodfacts-server/api/). Nutrition data is attributed to Open Food Facts in the app; its database is available under ODbL.
+# Version 2.2 additions
+
+Choose kg or lbs and km or miles under **You → Daily goals & profile**. Preferences apply to weight entries, trends, step distance, GPS distance, pace and route previews; underlying records keep kg/km for consistent backups and exports. Names are entered locally, never inferred from the phone owner.
+
+The home screen shows estimated daily walking calories: steps × stride (km) × body weight (kg) × 0.5 kcal/kg/km. Log weight or enter a profile weight first. This rough estimate excludes resting energy and other workouts, does not add GPS distances again, and follows the daily step bucket at local midnight.
+

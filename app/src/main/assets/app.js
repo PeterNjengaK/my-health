@@ -229,7 +229,7 @@ function refresh() {
   }
 }
 function header(title, kicker) {
-  return `<header><div><div class="eyebrow">${kicker}</div><h1>${title}</h1></div><button class="avatar" data-page="settings" aria-label="Profile">${esc((state.name || 'P')[0].toUpperCase())}</button></header>`;
+  return `<header><div><div class="eyebrow">${kicker}</div><h1>${title}</h1></div><button class="avatar" data-page="settings" aria-label="Profile">${esc((state.name || '?')[0].toUpperCase())}</button></header>`;
 }
 function render() {
   if (modal) return;
@@ -261,7 +261,7 @@ function ring() {
     goal = state.goals?.steps || 8000,
     pct = Math.min(n / goal, 1),
     distance = (n * (state.stride || 0.7)) / 1000;
-  return `<section class="hero"><div class="hero-top"><div><div class="eyebrow">Your daily movement</div><h2>Every step counts.</h2></div><span class="pill"><i class="dot"></i>${!state.sensor ? 'Unavailable' : state.permission ? 'Automatic' : 'Access needed'}</span></div><div class="ring"><svg viewBox="0 0 226 226"><circle class="track" cx="113" cy="113" r="101"/><circle class="fill" cx="113" cy="113" r="101" stroke-dasharray="635" stroke-dashoffset="${635 * (1 - pct)}"/></svg><div class="ring-value"><div class="shoe">${svg('activity')}</div><strong>${num(n)}</strong><span>of ${num(goal)} steps</span></div></div><div class="hero-foot"><div><strong>${distance.toFixed(2)}</strong><span>km · estimated</span></div><div><strong>${Math.round(pct * 100)}%</strong><span>daily goal</span></div><div><strong>${num(Math.max(0, goal - n))}</strong><span>steps to go</span></div></div></section>`;
+  return `<section class="hero"><div class="hero-top"><div><div class="eyebrow">Your daily movement</div><h2>Every step counts.</h2></div><span class="pill"><i class="dot"></i>${!state.sensor ? 'Unavailable' : state.permission ? 'Automatic' : 'Access needed'}</span></div><div class="ring"><svg viewBox="0 0 226 226"><circle class="track" cx="113" cy="113" r="101"/><circle class="fill" cx="113" cy="113" r="101" stroke-dasharray="635" stroke-dashoffset="${635 * (1 - pct)}"/></svg><div class="ring-value"><div class="shoe">${svg('activity')}</div><strong>${num(n)}</strong><span>of ${num(goal)} steps</span></div></div><div class="hero-foot"><div><strong>${distanceValue(distance).toFixed(2)}</strong><span>${distanceUnit()} · estimated</span></div><div><strong>${Math.round(pct * 100)}%</strong><span>daily goal</span></div><div><strong>${num(Math.max(0, goal - n))}</strong><span>steps to go</span></div></div></section>`;
 }
 function metric(type, value, sub, pct) {
   let t = types[type];
@@ -282,7 +282,7 @@ function home() {
       : !state.permission
         ? `<div class="notice">Daily steps run automatically and start fresh at 00:00. Allow Android physical activity access once to begin.<button data-action="tracking">Allow activity access</button></div>`
         : '') +
-    `<div class="section-title"><h2>Your daily balance</h2><button class="link" data-page="journal">Log health +</button></div><div class="grid">${metric('water', num(water), `of ${num(state.goals?.water || 2000)} ml`, (water / (state.goals?.water || 2000)) * 100)}${metric('sleep', sleep ? sleep.toFixed(1) : '—', `goal ${state.goals?.sleep || 8} hours`, (sleep / (state.goals?.sleep || 8)) * 100)}${metric('workout', num(sum('workout')), 'minutes of movement')}${metric('weight', w ? esc(w.value) : '—', w ? 'last logged ' + dateLabel(w.date) : 'Add your first weigh-in')}</div><div class="section-title"><h2>A little check-in</h2></div><div class="quick"><button data-add="water" data-quick="250">+ 250 ml water</button><button data-add="mood">☀ How I feel</button><button data-add="food">+ Meal</button></div>${medications()}<div class="section-title"><h2>Today’s journal</h2><button class="link" data-page="journal">View all ↗</button></div>${rows(
+    `<div class="section-title"><h2>Your daily balance</h2><button class="link" data-page="journal">Log health +</button></div><div class="grid">${metric('water', num(water), `of ${num(state.goals?.water || 2000)} ml`, (water / (state.goals?.water || 2000)) * 100)}${metric('sleep', sleep ? sleep.toFixed(1) : '—', `goal ${state.goals?.sleep || 8} hours`, (sleep / (state.goals?.sleep || 8)) * 100)}${metric('workout', num(sum('workout')), 'minutes of movement')}${metric('weight', w ? weightValue(weightKg(w)).toFixed(1) : '—', w ? 'last logged ' + dateLabel(w.date) : 'Add your first weigh-in')}</div><div class="section-title"><h2>A little check-in</h2></div><div class="quick"><button data-add="water" data-quick="250">+ 250 ml water</button><button data-add="mood">☀ How I feel</button><button data-add="food">+ Meal</button></div>${medications()}<div class="section-title"><h2>Today’s journal</h2><button class="link" data-page="journal">View all ↗</button></div>${rows(
       (state.entries || [])
         .filter((e) => e.date === today() && e.type !== 'medication')
         .slice()
@@ -347,7 +347,7 @@ function rows(a, canDelete = true, dates = false) {
       }
       return (
         head +
-        `<div class="row"><span class="icon ${t.color}">${t.icon}</span><div class="grow"><strong>${esc(e.label || t.name)}</strong><span>${esc(e.note || dateLabel(e.date))}${e.type === 'food' ? ` · P ${esc(e.protein || 0)} / C ${esc(e.carbs || 0)} / F ${esc(e.fat || 0)} g` : ''}</span></div><div class="value">${esc(e.value)}${e.diastolic ? '/' + esc(e.diastolic) : ''}<br><span class="muted small">${esc(e.unit || t.unit)}</span></div>${canDelete ? `<button class="delete" data-delete="${e.id}" aria-label="Delete entry">×</button>` : ''}</div>`
+        `<div class="row"><span class="icon ${t.color}">${t.icon}</span><div class="grow"><strong>${esc(e.label || t.name)}</strong><span>${esc(e.note || dateLabel(e.date))}${e.type === 'food' ? ` · P ${esc(e.protein || 0)} / C ${esc(e.carbs || 0)} / F ${esc(e.fat || 0)} g` : ''}</span></div><div class="value">${esc(e.type === 'weight' ? weightValue(weightKg(e)).toFixed(1) : e.value)}${e.diastolic ? '/' + esc(e.diastolic) : ''}<br><span class="muted small">${esc(e.type === 'weight' ? weightUnit() : e.unit || t.unit)}</span></div>${canDelete ? `<button class="delete" data-delete="${e.id}" aria-label="Delete entry">×</button>` : ''}</div>`
       );
     })
     .join('');
@@ -368,7 +368,7 @@ function trend(type) {
       .slice(-14),
     t = types[type];
   if (!a.length) return '';
-  let values = a.map((e) => parseFloat(e.value) || 0),
+  let values = a.map((e) => type === 'weight' ? weightValue(weightKg(e)) : parseFloat(e.value) || 0),
     lo = Math.min(...values),
     hi = Math.max(...values),
     points = values
@@ -377,7 +377,7 @@ function trend(type) {
           `${10 + (i * 280) / Math.max(1, values.length - 1)},${85 - ((v - lo) / Math.max(0.1, hi - lo)) * 65}`,
       )
       .join(' ');
-  return `<div class="section-title"><h2>${t.name} trend</h2><button class="link" data-add="${type}">Add +</button></div><div class="card"><div class="flex"><div><div class="eyebrow">Latest entry</div><span class="summary-number">${esc(a[a.length - 1].value)}</span> <span class="muted">${t.unit}</span></div><span class="badge">${a.length} readings</span></div><svg class="sparkline" viewBox="0 0 300 100" preserveAspectRatio="none"><path d="M10 85H290" stroke="#e5e9e1"/><polyline points="${points}" fill="none" stroke="#164c3d" stroke-width="2.5" stroke-linejoin="round"/>${values.map((v, i) => `<circle cx="${10 + (i * 280) / Math.max(1, values.length - 1)}" cy="${85 - ((v - lo) / Math.max(0.1, hi - lo)) * 65}" r="3" fill="#164c3d"/>`).join('')}</svg><div class="flex small muted"><span>${dateLabel(a[0].date)}</span><span>${dateLabel(a[a.length - 1].date)}</span></div></div>`;
+  return `<div class="section-title"><h2>${t.name} trend</h2><button class="link" data-add="${type}">Add +</button></div><div class="card"><div class="flex"><div><div class="eyebrow">Latest entry</div><span class="summary-number">${esc(type === 'weight' ? weightValue(weightKg(a[a.length - 1])).toFixed(1) : a[a.length - 1].value)}</span> <span class="muted">${type === 'weight' ? weightUnit() : t.unit}</span></div><span class="badge">${a.length} readings</span></div><svg class="sparkline" viewBox="0 0 300 100" preserveAspectRatio="none"><path d="M10 85H290" stroke="#e5e9e1"/><polyline points="${points}" fill="none" stroke="#164c3d" stroke-width="2.5" stroke-linejoin="round"/>${values.map((v, i) => `<circle cx="${10 + (i * 280) / Math.max(1, values.length - 1)}" cy="${85 - ((v - lo) / Math.max(0.1, hi - lo)) * 65}" r="3" fill="#164c3d"/>`).join('')}</svg><div class="flex small muted"><span>${dateLabel(a[0].date)}</span><span>${dateLabel(a[a.length - 1].date)}</span></div></div>`;
 }
 function insights() {
   let ds = days(7),
@@ -425,10 +425,11 @@ function add(type) {
 }
 function goals() {
   open(
-    `<h2>Your everyday goals</h2><p>Choose targets that work for you.</p><form id="goals"><label>Your name</label><input name="name" value="${esc(state.name || 'Peter')}" maxlength="40" required><label>Daily step goal</label><input name="steps" type="number" min="100" max="100000" value="${state.goals?.steps || 8000}" required><label>Daily water goal (ml)</label><input name="water" type="number" min="100" max="10000" value="${state.goals?.water || 2000}" required><label>Sleep goal (hours)</label><input name="sleep" type="number" min="1" max="24" step="0.5" value="${state.goals?.sleep || 8}" required><label>Stride length (metres)</label><input name="stride" type="number" min="0.2" max="2" step="0.01" value="${state.stride || 0.7}" required><p>Stride length is the distance of one step. It is used only to estimate walking distance.</p><button class="primary">Save preferences</button><button class="secondary" type="button" data-action="close">Cancel</button></form>`,
+    `<h2>Your everyday goals</h2><p>Choose targets that work for you.</p><form id="goals"><label>Your name</label><input name="name" value="${esc(state.name || '')}" maxlength="40"><label>Weight unit</label><select name="weightUnit" id="profile-weight-unit"><option value="kg" ${state.weightUnit !== "lbs" ? "selected" : ""}>Kilograms (kg)</option><option value="lbs" ${state.weightUnit === "lbs" ? "selected" : ""}>Pounds (lbs)</option></select><label>Distance unit</label><select name="distanceUnit"><option value="km" ${state.distanceUnit !== "mi" ? "selected" : ""}>Kilometres (km)</option><option value="mi" ${state.distanceUnit === "mi" ? "selected" : ""}>Miles (mi)</option></select><label>Body weight for calorie estimates (selected weight unit, optional)</label><input name="bodyWeight" type="number" min="1" max="1500" step="any" value="${state.bodyWeightKg ? weightValue(state.bodyWeightKg).toFixed(1) : ""}"><p>Your name is entered here, never read from the phone owner account.</p><label>Daily step goal</label><input name="steps" type="number" min="100" max="100000" value="${state.goals?.steps || 8000}" required><label>Daily water goal (ml)</label><input name="water" type="number" min="100" max="10000" value="${state.goals?.water || 2000}" required><label>Sleep goal (hours)</label><input name="sleep" type="number" min="1" max="24" step="0.5" value="${state.goals?.sleep || 8}" required><label>Stride length (metres)</label><input name="stride" type="number" min="0.2" max="2" step="0.01" value="${state.stride || 0.7}" required><p>Stride length is the distance of one step. It is used only to estimate walking distance.</p><button class="primary">Save preferences</button><button class="secondary" type="button" data-action="close">Cancel</button></form>`,
   );
 }
 function save(e) {
+  normalizeEntryUnits(e);
   let error = Health.add(JSON.stringify(e));
   if (error) {
     toast(error);
@@ -457,6 +458,8 @@ document.addEventListener('submit', (ev) => {
       JSON.stringify({
         name: o.name.trim(),
         stride: +o.stride,
+        weightUnit: o.weightUnit, distanceUnit: o.distanceUnit,
+        bodyWeightKg: o.bodyWeight ? +o.bodyWeight / (o.weightUnit === 'lbs' ? 2.2046226218 : 1) : 0,
         goals: { steps: +o.steps, water: +o.water, sleep: +o.sleep },
       }),
     );
@@ -521,7 +524,8 @@ function toast(s) {
   clearTimeout(window.toastTimer);
   window.toastTimer = setTimeout(() => ($('toast').style.display = 'none'), 3000);
 }
-refresh();
+// Wait for the remaining feature scripts before the initial render.
+document.addEventListener('DOMContentLoaded', refresh);
 setInterval(refresh, 3000);
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) refresh();
