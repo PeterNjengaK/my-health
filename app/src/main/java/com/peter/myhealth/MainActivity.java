@@ -52,6 +52,7 @@ public class MainActivity extends Activity {
         web.loadUrl("https://app.health.local/index.html");
         if (Build.VERSION.SDK_INT >= 33) getOnBackInvokedDispatcher().registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, () -> web.evaluateJavascript("back()", null));
         if (Store.prefs(this).getBoolean("tracking", false)) startSteps();
+        ReminderReceiver.schedule(this);
     }
     void toast(String s) { runOnUiThread(() -> Toast.makeText(this, s, Toast.LENGTH_LONG).show()); }
     void startSteps() {

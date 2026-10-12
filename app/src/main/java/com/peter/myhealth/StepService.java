@@ -34,6 +34,7 @@ public class StepService extends Service implements SensorEventListener {
         long current = (long)event.values[0], last = p.getLong("counter", -1);
         int boot = android.provider.Settings.Global.getInt(getContentResolver(), android.provider.Settings.Global.BOOT_COUNT, 0);
         boolean sameBoot = p.getInt("boot", -1) == boot;
+        if (sameBoot && last >= 0 && current < last) return;
         long delta = StepMath.delta(last, current, sameBoot);
         // Sensor events are stamped with elapsed time: delayed events retain their actual day.
         String day = StepMath.eventDay(System.currentTimeMillis(), SystemClock.elapsedRealtimeNanos(), event.timestamp, java.time.ZoneId.systemDefault());
