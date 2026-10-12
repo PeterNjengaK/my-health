@@ -1,0 +1,6 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/widget_background">
+    <TextView android:id="@+id/widget_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="MY HEALTH · TODAY" android:textColor="#C7EE8F" android:textSize="10sp" />
+    <TextView android:id="@+id/widget_steps" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="—" android:textColor="#FFFFFF" android:textSize="30sp" android:textStyle="bold" />
+    <TextView android:id="@+id/widget_goal" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Open My Health" android:textColor="#CBDDCB" android:textSize="11sp" />
+    <ProgressBar android:id="@+id/widget_progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="6dp" android:layout_marginTop="9dp" android:max="100" android:progressTint="#C7EE8F" android:progressBackgroundTint="#356657" />
+</LinearLayout>

@@ -1,22 +1,29 @@
 # My Health
 
-A personal, ad-free Android health journal with hardware step counting, an offline dashboard, and daily habit tracking. Built for Android 10 and later.
+A personal, ad-free Android health journal with hardware step counting, GPS workouts, connected health imports, and daily habit tracking. Built for Android 10 and later; Health Connect imports require Android 14 or later. Version 2.0 keeps the journal usable offline and adds optional network access only for food barcode lookup.
 
 ## Included
 
 - **Automatic daily steps:** native `TYPE_STEP_COUNTER` sensor, physical activity permission, ongoing foreground service, daily history, editable goals, weekly charts, reboot recovery, and estimated walking distance using a configurable stride length.
 - **Daily dashboard:** step progress, hydration, sleep, exercise minutes, most recent weight, medication routine, and today's journal.
-- **Health journal:** water, weight, sleep duration and quality, workouts and distance, meals/calories/macronutrients, blood pressure, heart rate, blood glucose (mmol/L or mg/dL), temperature, mood, symptoms, cycle notes, medication schedules, dose adherence, and freeform notes. Records can be backdated and deleted.
+- **Health journal:** water, weight, sleep duration and quality, workouts and distance, meals/calories/macronutrients, blood pressure, heart rate, blood glucose (mmol/L or mg/dL), temperature, mood, symptoms, cycle notes, medication schedules, dose adherence, and freeform notes. Records can be backdated, edited in place, and deleted.
 - **Insights:** step history, goals achieved, hydration/sleep averages on logged days, nutrition totals, measurement history, and weight/heart-rate/sleep/mood trends.
 - **Medication reminders:** daily Android notifications, rescheduled after restart; delete the medication entry to stop its reminder.
-- **Personalization:** name, daily step/water/sleep goals, and stride length.
+- **GPS workouts:** start a walk/run/ride, track duration, measured distance and pace in a foreground location service, pause/resume, finish/save, and view an offline route preview. Routes are private local data. GPS accuracy filters exclude stale, noisy and implausible fixes. Interrupted sessions are recoverable in a paused state.
+- **Health Connect:** optional read-only imports for steps, sleep, exercise, weight, heart rate, blood pressure, glucose and temperature. Import the last 30 days on demand; refresh when returning to the app, up to every 15 minutes. Record IDs prevent duplicate imports; local edits and deleted-import tombstones are respected. Steps use platform aggregation, then take the larger of phone and imported totals. Habit totals compare sources to reduce double counting.
+- **Food barcode scanning:** portrait camera scanner, manual barcode entry, HTTPS nutrition lookup through Open Food Facts, portion scaling, and an offline cache for previously looked-up products. Lookup failures and missing nutrition allow manual entry. Verify community data against the package label.
+- **Hydration reminders:** configurable 30–240 minute intervals during 8 am–9 pm, skipping notifications after the daily water goal is met.
+- **Step widget:** home-screen progress, daily goals and tracking state. Updated with steps and periodic refresh. Tap to open My Health. Counts are hidden when app-lock protection is enabled.
+- **Reports:** 7/30/90-day movement calendars and weight change; CSV export of all records and daily steps; a paginated 30-day PDF report. Files are saved through Android's document picker. CSV text cells protect against spreadsheet formula injection.
+- **App lock:** optional Android biometric/device-credential authentication, journal hidden when leaving the app, and screenshot protection while enabled. Fingerprints are handled by Android; the app stores no biometric data.
+- **Personalization:** name, daily step/water/sleep goals, stride length, and light/dark/system appearance.
 - **Backup and restore:** JSON export through Android's document picker; restore validates the file and asks before replacing current records.
 
 ## Privacy
 
-There is no `INTERNET` permission, advertising SDK, analytics SDK, account system, or cloud backend. Records live in the application's private storage. Android cloud backup and device transfer are disabled; use the explicit export feature to move your records. Exported backups contain sensitive health data, so choose their storage location carefully.
+There is no advertising SDK, analytics SDK, account system, or cloud backend. Records and GPS routes live in the application's private storage. The `INTERNET` permission is used by a native HTTPS request only when looking up a food barcode. That request sends the product barcode to Open Food Facts; it sends no journal entries, personal measurements, Health Connect data or GPS coordinates. Android cloud backup and device transfer are disabled; use the explicit export feature to move your records. Exported backups and reports contain sensitive health data, so choose their storage location carefully.
 
-The interface uses bundled HTML/CSS/JavaScript in a locked-down WebView. Only a local synthetic HTTPS origin is served; external navigation, network loads, file access, and content access are blocked. Android Java code handles the sensor, persistent records, notifications, boot recovery, permissions, and file operations. User-provided text is escaped before rendering.
+The interface uses bundled HTML/CSS/JavaScript in a locked-down WebView. Only a local synthetic HTTPS origin is served; external navigation, WebView network loads, file access, and content access are blocked. Android Java code handles sensors, GPS, Health Connect, the barcode scanner/lookup, authentication, persistent records, notifications, widgets and file operations. User-provided text is escaped before rendering. JavaScript bridge reads and writes are denied while the app is locked. Backups validate record IDs, measurements, dates, and route coordinates before replacement.
 
 ## Getting started
 
@@ -26,13 +33,18 @@ The interface uses bundled HTML/CSS/JavaScript in a locked-down WebView. Only a 
 4. Add health records in **Journal** or use the dashboard shortcuts.
 5. If the phone pauses tracking, allow background activity in the app's battery settings. Android force-stop prevents tracking and reminders until the app is opened again.
 6. Export a backup before uninstalling; uninstalling removes private app records.
+7. Start GPS sessions from **Activity**, scan a food from **Today** or the meal form, and change appearance, hydration reminders, widget and app-lock settings under **You**.
+8. Choose Health Connect access under **You**, then sync. A compatible watch/app must first write records to Health Connect. An empty successful sync means no source records are available; the phone does not independently measure sleep or vital signs.
 
 ## Boundaries
 
 - A hardware step-counter sensor is required for automatic steps. This app does not infer steps from an accelerometer on unsupported devices.
 - Daily totals follow the phone's local timezone. Sensor event timestamps determine the date of delivered events. If tracking is interrupted for a long period spanning midnight, a cumulative sensor reading cannot reconstruct precisely which missing steps belonged to which day. The delta is assigned to the event's reporting day.
-- Distance is an estimate. This version does not use GPS, calculate calories burned, or import wearable/Health Connect data.
-- Sleep, food, workouts, and vital signs are entered manually. Blood pressure, glucose, heart rate, and temperature require an appropriate separate measuring device. Charts are descriptive; the app provides no diagnosis or treatment advice.
+- Daily step distance is an estimate. GPS-session distance uses accepted GPS fixes and depends on signal quality. Route previews draw the recorded path without map tiles or street labels. This version does not calculate calories burned.
+- Sleep and vital signs can be entered manually or imported from Health Connect. Automatic sleep requires a compatible source device/app. Blood pressure, glucose, heart rate, and temperature require an appropriate separate measuring device. Charts are descriptive; the app provides no diagnosis or treatment advice.
+- Health Connect access is limited to approved categories and the last 30 days. It does not directly pair a watch over Bluetooth or write data back. Imports refresh while the app is in the foreground; provider availability and permissions can vary by device.
+- To avoid inflated daily totals, phone steps and imported steps are compared rather than added. Sleep/workout totals use the highest source total for a given day; this conservative approach can undercount distinct activities logged to different sources.
+- After a reboot or force-stop, a GPS workout is recovered paused using its latest persisted duration. Background GPS depends on Android location permissions and power management. No background location permission is requested; sessions must start while the app is visible.
 - Medication reminders use inexact alarms. Android power management can delay them. They are daily schedules rather than a clinical medication-management system.
 - There are no fabricated starter records or simulated step totals.
 
@@ -69,10 +81,22 @@ adb forward tcp:9222 localabstract:webview_devtools_remote_<PID>
 node scripts/device-smoke.cjs
 ```
 
-The smoke script checks all five pages and fourteen log forms, native persistence/deletion, escaping, validation, scroll position, and JavaScript exceptions. It creates temporary records and removes them in `finally`; it never modifies step totals. Avoid interacting with the app during this test.
+The smoke script checks all five pages and fourteen log forms, native save/edit/delete, atomic validation, themes, barcode portions, movement calendars, escaping, scroll position and JavaScript exceptions. It creates temporary records and removes them in `finally`; it never modifies step totals. Avoid interacting with the app during this test.
 
-Validated on a TCL T807W: install and launch, foreground health service, hardware sensor registration, and real increasing step totals. Android lint passes with no errors. Advisory lint warnings remain for JavaScript (required for bundled UI), intentional synchronous persistence, and newer available SDK versions.
+Native checks cover real PDF generation, CSV escaping/formula protection, valid/invalid measurements, workout timing and decoding a real EAN-13 barcode:
+
+```sh
+./gradlew :app:assembleDebugAndroidTest
+adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+adb shell am instrument -w com.peter.myhealth.test/com.peter.myhealth.IntegrationChecks
+```
+
+`node scripts/device-gps.cjs` checks start, pause, stable paused duration, resume, finish/save and cleanup on a foreground phone with GPS and precise location enabled. It skips an already-active user workout and never injects simulated locations.
+
+Validated on a TCL T807W running Android 16: upgrade preserving records/steps, hardware step registration, widget display, real Open Food Facts lookup, Health Connect consent and successful empty sync, GPS session controls and native checks. Android lint passes with no errors. Fingerprint authentication requires the owner's biometric/device credential and is available as an optional setting. Advisory warnings remain for intentional synchronous persistence, bundled JavaScript, English native strings and newer available SDK versions.
 
 ## Source layout
 
-`app/src/main/java/com/peter/myhealth/` contains Android integration and step math. `app/src/main/assets/` contains the offline interface. `tests/` and `scripts/` contain repeatable regression/device checks. Build outputs, local SDK configuration, screenshots, backups, and signing keys are excluded from Git.
+`app/src/main/java/com/peter/myhealth/` contains Android integrations, validation and step math. `app/src/main/assets/` contains the offline interface and v2 UI. `tests/`, `app/src/androidTest/` and `scripts/` contain repeatable checks. Build outputs, local SDK configuration, screenshots, backups, reports and signing keys are excluded from Git.
+
+Implementation references: [Android Health Connect platform API](https://developer.android.com/reference/android/health/connect/HealthConnectManager), [ZXing Android Embedded](https://github.com/journeyapps/zxing-android-embedded), and [Open Food Facts API](https://openfoodfacts.github.io/openfoodfacts-server/api/). Nutrition data is attributed to Open Food Facts in the app; its database is available under ODbL.

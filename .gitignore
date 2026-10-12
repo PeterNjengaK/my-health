@@ -8,3 +8,5 @@ artifacts/
 backups/
 my-health-*.json
 *.apk
+my-health-*.csv
+my-health-*.pdf

@@ -1,0 +1,470 @@
+/* Calm surfaces, consistent controls, and a complete dark palette. */
+:root {
+  color-scheme: light;
+  --soft: #edf2e7;
+  --shadow: 0 4px 20px #193d2c05;
+}
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #101b17;
+  --card: #192720;
+  --ink: #e0edde;
+  --muted: #a2b2a4;
+  --green: #244f3d;
+  --line: #2c3c30;
+  --blue: #223f48;
+  --peach: #49392c;
+  --lavender: #383448;
+  --soft: #213025;
+  --shadow: 0 4px 20px #0001;
+}
+body {
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+main {
+  padding: 26px 20px 112px;
+}
+header {
+  margin-bottom: 26px;
+}
+h1 {
+  font-size: clamp(25px, 7.3vw, 32px);
+  line-height: 1.18;
+  font-weight: 620;
+}
+h2 {
+  font-weight: 620;
+}
+button,
+.link,
+.check,
+.edit-entry {
+  min-height: 44px;
+}
+.card {
+  box-shadow: var(--shadow);
+}
+.hero {
+  background: linear-gradient(145deg, #124738, #225b45);
+  border: 1px solid #44715855;
+  box-shadow: 0 12px 32px #17483615;
+}
+.hero h2 {
+  font-size: 21px;
+}
+.ring-value strong {
+  font-weight: 560;
+  font-variant-numeric: tabular-nums;
+}
+.hero-foot strong {
+  font-variant-numeric: tabular-nums;
+}
+.ring > svg {
+  position: absolute;
+  inset: 0;
+}
+.ring .shoe svg {
+  position: static;
+  width: 24px;
+  height: 24px;
+  transform: none;
+}
+.metric {
+  min-height: 167px;
+}
+.metric-head {
+  font-size: 12px;
+}
+.metric strong {
+  font-weight: 590;
+}
+.icon svg {
+  width: 20px;
+  height: 20px;
+}
+.icon.green {
+  background: var(--soft);
+}
+.empty,
+.notice {
+  background: var(--soft);
+}
+.quick button,
+.filter button {
+  background: var(--card);
+}
+.filter button.active {
+  color: #fff;
+}
+.progress {
+  background: var(--line);
+}
+.quick button {
+  min-height: 46px;
+}
+.primary,
+.switch {
+  background: #1c5842;
+  color: #fff;
+}
+.secondary {
+  background: var(--soft);
+  color: var(--ink);
+}
+input,
+select,
+textarea {
+  background: var(--card);
+  color: var(--ink);
+  border-color: var(--line);
+}
+label {
+  letter-spacing: 0.2px;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #79a888;
+  box-shadow: 0 0 0 3px #83ac7620;
+}
+nav {
+  height: 78px;
+  background: var(--card);
+  box-shadow: 0 -5px 25px #00003;
+}
+nav button.active {
+  color: var(--ink);
+}
+nav button.active svg {
+  background: var(--soft);
+  border-radius: 10px;
+  padding: 5px;
+  width: 34px;
+  height: 30px;
+}
+nav button {
+  min-height: 60px;
+  font-size: 10px;
+}
+.avatar {
+  background: var(--soft);
+  border: 1px solid var(--line);
+}
+.feature-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 16px 0 0;
+}
+.feature-strip button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 10px;
+  padding: 8px 2px;
+}
+.feature-strip svg {
+  width: 23px;
+  height: 23px;
+  color: var(--ink);
+}
+.feature-strip button + button {
+  border-left: 1px solid var(--line);
+}
+.section-title {
+  margin-top: 28px;
+}
+.split-buttons {
+  display: flex;
+  gap: 10px;
+}
+.split-buttons > button {
+  flex: 1;
+  font-size: 11px;
+}
+.split-buttons .primary,
+.split-buttons .secondary {
+  margin-top: 12px;
+}
+.edit-entry {
+  background: transparent;
+  color: var(--muted);
+  font-size: 17px;
+  padding: 8px;
+  min-width: 32px;
+}
+.row {
+  gap: 9px;
+}
+.row .grow {
+  overflow: hidden;
+}
+.row .grow strong,
+.row .grow span {
+  overflow-wrap: anywhere;
+}
+.row .value {
+  max-width: 100px;
+  overflow-wrap: anywhere;
+}
+.delete {
+  min-width: 30px;
+  padding: 7px;
+}
+.catalog {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.catalog .card {
+  padding: 12px;
+  border-radius: 17px;
+  gap: 8px;
+}
+.catalog h3 {
+  font-size: 11px;
+  line-height: 1.4;
+}
+.catalog .small {
+  display: none;
+}
+.workout-intro {
+  background: linear-gradient(140deg, var(--card), var(--soft));
+}
+.workout-intro h2 {
+  margin-top: 20px;
+  font-size: 25px;
+}
+.workout-types {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 22px;
+}
+.workout-types button {
+  background: #1c5842;
+  color: #fff;
+  border-radius: 13px;
+  font-size: 12px;
+  padding: 13px 7px;
+}
+.route-empty {
+  background: var(--soft);
+  border: 1px dashed var(--line);
+  border-radius: 18px;
+  padding: 35px 15px;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+}
+.route-empty svg {
+  width: 30px;
+  height: 30px;
+}
+.route-empty strong {
+  font-size: 13px;
+  color: var(--ink);
+}
+.route-empty span {
+  font-size: 11px;
+}
+.route-map {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--soft);
+  margin: 18px 0;
+}
+.route-map > svg {
+  width: 100%;
+  height: 210px;
+  display: block;
+}
+.map-label {
+  position: absolute;
+  bottom: 9px;
+  right: 12px;
+  font-size: 9px;
+  color: var(--muted);
+}
+.workout-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  text-align: center;
+  padding: 6px 0 12px;
+}
+.workout-stats strong {
+  display: block;
+  font-size: 23px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.workout-stats span {
+  display: block;
+  margin-top: 7px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.workout-stats > div + div {
+  border-left: 1px solid var(--line);
+}
+.live {
+  background: var(--soft);
+  color: var(--ink);
+}
+.live .dot {
+  background: #85b779;
+}
+.session-banner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--soft);
+  border-radius: 15px;
+  margin-top: 20px;
+  padding: 14px 10px;
+  font-size: 12px;
+}
+.calendar-card {
+  margin-top: 12px;
+}
+.heatmap {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: 14px;
+}
+.heat {
+  height: 32px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  background: var(--soft);
+  font-size: 10px;
+  color: var(--muted);
+}
+.heat.some {
+  background: #a6c892;
+  color: #214936;
+}
+.heat.full {
+  background: #245b40;
+  color: #eff9e7;
+}
+.stat small {
+  font-size: 11px;
+  font-weight: 400;
+}
+.badge {
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+}
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.profile-initial {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  background: var(--soft);
+  font-size: 26px;
+}
+.profile-card h2 {
+  margin-bottom: 5px;
+}
+.settings-row {
+  gap: 12px;
+}
+.settings-row > div {
+  flex: 1;
+}
+.settings-row span {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+}
+.settings-row strong {
+  font-size: 13px;
+}
+.compact-select {
+  width: 100px;
+  font-size: 11px;
+  padding: 12px 8px;
+}
+.connected-title {
+  margin-top: 17px;
+  font-size: 18px;
+}
+.sync-status {
+  color: var(--ink);
+  font-size: 12px;
+  background: var(--soft);
+  padding: 10px;
+  border-radius: 10px;
+}
+.scan-button {
+  width: 100%;
+  padding: 13px;
+  border-radius: 13px;
+  background: var(--soft);
+}
+.attribution {
+  font-size: 10px !important;
+  line-height: 1.6;
+  margin: 10px 0 16px !important;
+  color: var(--muted);
+}
+.food-product {
+  margin: 20px 0;
+}
+.food-product h3 {
+  margin-top: 15px;
+  font-size: 19px;
+}
+.nutrition-line {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.nutrition-line strong {
+  font-size: 20px;
+}
+.nutrition-line span {
+  color: var(--muted);
+  font-size: 11px;
+}
+.sheet {
+  overscroll-behavior: contain;
+}
+.check {
+  background: var(--soft);
+}
+.link {
+  color: var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
