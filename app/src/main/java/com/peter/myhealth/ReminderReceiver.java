@@ -87,7 +87,7 @@ public class ReminderReceiver extends BroadcastReceiver {
         nm.notify(
             31,
             new Notification.Builder(c, "water")
-                .setSmallIcon(R.drawable.ic_health)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("Time for a water break")
                 .setContentText("A small sip, a little reset. Log your drink in My Health.")
                 .setContentIntent(
@@ -114,7 +114,7 @@ public class ReminderReceiver extends BroadcastReceiver {
         nm.notify(
             e.getString("id").hashCode(),
             new Notification.Builder(c, "reminders")
-                .setSmallIcon(R.drawable.ic_health)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("Medication reminder")
                 .setContentText(e.optString("label") + " · " + e.optString("value"))
                 .setContentIntent(open)

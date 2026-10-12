@@ -24,11 +24,28 @@ public class IntegrationChecks extends Instrumentation {
     Bundle result = new Bundle();
     try {
       Context c = getTargetContext();
+      Activity screen =
+          startActivitySync(
+              new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+      Thread.sleep(600);
+      if (c.checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION)
+          == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+        check(StepService.running, "Tracking starts automatically without an app toggle");
+        runOnMainSync(
+            () -> {
+              c.startForegroundService(new Intent(c, StepService.class));
+              c.startForegroundService(new Intent(c, StepService.class));
+            });
+        Thread.sleep(400);
+        check(StepService.running, "Repeated starts keep the existing sensor listener");
+      }
       JSONObject before = Store.snapshot(c);
       check(StepMath.delta(-1, 9000, true) == 0, "First sensor baseline");
       check(StepMath.delta(9000, 9030, true) == 30, "Sensor delta");
       check(StepMath.delta(9030, 15, false) == 15, "Reboot recovery");
       check(Reports.cell("=SUM(A1)").equals("\"'=SUM(A1)\""), "CSV formula protection");
+      check(Reports.cell("\t=SUM(A1)").startsWith("\"'"), "CSV tab-prefixed formula protection");
+      check(Reports.cell("  +SUM(A1)").startsWith("\"'"), "CSV space-prefixed formula protection");
       check(Reports.cell("a\"b").equals("\"a\"\"b\""), "CSV quotes");
       String csv = Reports.csv(c);
       check(csv.startsWith("date,type,label"), "CSV headers");
@@ -102,12 +119,13 @@ public class IntegrationChecks extends Instrumentation {
           Store.snapshot(c).getJSONArray("entries").length()
               == before.getJSONArray("entries").length(),
           "Tests preserve journal");
-      check(
-          Store.snapshot(c)
-              .getJSONObject("steps")
-              .toString()
-              .equals(before.getJSONObject("steps").toString()),
-          "Tests preserve steps");
+      for (java.util.Iterator<String> keys = before.getJSONObject("steps").keys();
+          keys.hasNext(); ) {
+        String day = keys.next();
+        check(
+            Store.step(c, day) >= before.getJSONObject("steps").getInt(day),
+            "Historical steps remain intact");
+      }
       result.putString(
           "stream",
           "PASS: "

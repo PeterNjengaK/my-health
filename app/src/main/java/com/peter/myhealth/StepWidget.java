@@ -28,7 +28,10 @@ public class StepWidget extends AppWidgetProvider {
             : "of "
                 + goal
                 + " · "
-                + (Store.prefs(c).getBoolean("tracking", false) ? "Tracking" : "Paused"));
+                + (c.checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION)
+                        == android.content.pm.PackageManager.PERMISSION_GRANTED
+                    ? "Automatic · resets 00:00"
+                    : "Activity permission needed"));
     views.setProgressBar(
         R.id.widget_progress,
         100,

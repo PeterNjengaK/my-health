@@ -10,3 +10,6 @@ my-health-*.json
 *.apk
 my-health-*.csv
 my-health-*.pdf
+.release/
+release-config.properties
+*.p12

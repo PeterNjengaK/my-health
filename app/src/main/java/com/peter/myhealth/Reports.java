@@ -10,7 +10,10 @@ import org.json.*;
 final class Reports {
   static String cell(String v) {
     String safe = v == null ? "" : v;
-    if (safe.matches("^[=+@-].*")) safe = "'" + safe;
+    if (safe.matches("(?s)^[\\s\\uFEFF]*[=+@-].*")
+        || safe.startsWith("\t")
+        || safe.startsWith("\r")
+        || safe.startsWith("\n")) safe = "'" + safe;
     return "\"" + safe.replace("\"", "\"\"") + "\"";
   }
 

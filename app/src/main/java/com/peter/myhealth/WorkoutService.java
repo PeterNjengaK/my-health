@@ -60,6 +60,11 @@ public class WorkoutService extends Service implements LocationListener {
 
   public int onStartCommand(Intent intent, int flags, int id) {
     String action = intent == null ? "resume" : intent.getAction();
+    if (!"finish".equals(action) && !"pause".equals(action) && !ProBilling.access(this)) {
+      pauseStored();
+      stopSelf();
+      return START_NOT_STICKY;
+    }
     if ("finish".equals(action)) {
       try {
         finish(stored(this));
@@ -241,7 +246,7 @@ public class WorkoutService extends Service implements LocationListener {
             new Intent(this, WorkoutService.class).setAction("finish"),
             PendingIntent.FLAG_IMMUTABLE);
     return new Notification.Builder(this, "workout")
-        .setSmallIcon(R.drawable.ic_health)
+        .setSmallIcon(R.drawable.ic_notification)
         .setContentTitle(
             w.optString("label", "Workout")
                 + (w.optBoolean("paused") ? " · Paused" : " · Recording"))

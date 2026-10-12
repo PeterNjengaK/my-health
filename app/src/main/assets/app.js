@@ -261,7 +261,7 @@ function ring() {
     goal = state.goals?.steps || 8000,
     pct = Math.min(n / goal, 1),
     distance = (n * (state.stride || 0.7)) / 1000;
-  return `<section class="hero"><div class="hero-top"><div><div class="eyebrow">Your daily movement</div><h2>Every step counts.</h2></div><span class="pill"><i class="dot"></i>${state.tracking && state.permission ? 'Tracking' : 'Paused'}</span></div><div class="ring"><svg viewBox="0 0 226 226"><circle class="track" cx="113" cy="113" r="101"/><circle class="fill" cx="113" cy="113" r="101" stroke-dasharray="635" stroke-dashoffset="${635 * (1 - pct)}"/></svg><div class="ring-value"><div class="shoe">${svg('activity')}</div><strong>${num(n)}</strong><span>of ${num(goal)} steps</span></div></div><div class="hero-foot"><div><strong>${distance.toFixed(2)}</strong><span>km · estimated</span></div><div><strong>${Math.round(pct * 100)}%</strong><span>daily goal</span></div><div><strong>${num(Math.max(0, goal - n))}</strong><span>steps to go</span></div></div></section>`;
+  return `<section class="hero"><div class="hero-top"><div><div class="eyebrow">Your daily movement</div><h2>Every step counts.</h2></div><span class="pill"><i class="dot"></i>${!state.sensor ? 'Unavailable' : state.permission ? 'Automatic' : 'Access needed'}</span></div><div class="ring"><svg viewBox="0 0 226 226"><circle class="track" cx="113" cy="113" r="101"/><circle class="fill" cx="113" cy="113" r="101" stroke-dasharray="635" stroke-dashoffset="${635 * (1 - pct)}"/></svg><div class="ring-value"><div class="shoe">${svg('activity')}</div><strong>${num(n)}</strong><span>of ${num(goal)} steps</span></div></div><div class="hero-foot"><div><strong>${distance.toFixed(2)}</strong><span>km · estimated</span></div><div><strong>${Math.round(pct * 100)}%</strong><span>daily goal</span></div><div><strong>${num(Math.max(0, goal - n))}</strong><span>steps to go</span></div></div></section>`;
 }
 function metric(type, value, sub, pct) {
   let t = types[type];
@@ -277,9 +277,11 @@ function home() {
       dateLabel(today(), { weekday: 'long', month: 'long', day: 'numeric' }),
     ) +
     ring() +
-    (!state.tracking || !state.permission
-      ? `<div class="notice">Start your daily step count. Allow physical activity access to count steps while your phone is with you.<button data-action="tracking">Enable step tracking</button></div>`
-      : '') +
+    (!state.sensor
+      ? '<div class="notice">This phone does not have a supported step counter. Your health journal is available.</div>'
+      : !state.permission
+        ? `<div class="notice">Daily steps run automatically and start fresh at 00:00. Allow Android physical activity access once to begin.<button data-action="tracking">Allow activity access</button></div>`
+        : '') +
     `<div class="section-title"><h2>Your daily balance</h2><button class="link" data-page="journal">Log health +</button></div><div class="grid">${metric('water', num(water), `of ${num(state.goals?.water || 2000)} ml`, (water / (state.goals?.water || 2000)) * 100)}${metric('sleep', sleep ? sleep.toFixed(1) : '—', `goal ${state.goals?.sleep || 8} hours`, (sleep / (state.goals?.sleep || 8)) * 100)}${metric('workout', num(sum('workout')), 'minutes of movement')}${metric('weight', w ? esc(w.value) : '—', w ? 'last logged ' + dateLabel(w.date) : 'Add your first weigh-in')}</div><div class="section-title"><h2>A little check-in</h2></div><div class="quick"><button data-add="water" data-quick="250">+ 250 ml water</button><button data-add="mood">☀ How I feel</button><button data-add="food">+ Meal</button></div>${medications()}<div class="section-title"><h2>Today’s journal</h2><button class="link" data-page="journal">View all ↗</button></div>${rows(
       (state.entries || [])
         .filter((e) => e.date === today() && e.type !== 'medication')
@@ -502,7 +504,7 @@ document.addEventListener('click', (ev) => {
       toast('This phone does not have a step counter sensor');
       return;
     }
-    Health.tracking(!state.tracking);
+    Health.tracking(true);
     setTimeout(refresh, 700);
   } else if (['notifications', 'battery', 'export', 'restore'].includes(act)) Health[act]();
 });

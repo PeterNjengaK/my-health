@@ -13,6 +13,7 @@ public class MainActivity extends Activity {
   private WebView web;
   private String exportData;
   private byte[] documentBytes;
+  private ProBilling billing;
   private volatile boolean unlocked;
   private boolean authenticating, externalFlow;
   private android.view.View lockCover;
@@ -24,6 +25,8 @@ public class MainActivity extends Activity {
 
   public void onCreate(Bundle b) {
     super.onCreate(b);
+    billing = new ProBilling(this);
+    billing.start();
     unlocked = !Store.prefs(this).getBoolean("appLock", false);
     try {
       JSONObject w = WorkoutService.stored(this);
@@ -119,13 +122,40 @@ public class MainActivity extends Activity {
           .registerOnBackInvokedCallback(
               android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT,
               () -> web.evaluateJavascript("back()", null));
-    if (Store.prefs(this).getBoolean("tracking", false)) startSteps();
+    startSteps();
+    DailyBoundaryReceiver.refresh(this);
     ReminderReceiver.schedule(this);
     applySystemTheme(Store.prefs(this).getString("theme", "system"));
   }
 
   public void onResume() {
     super.onResume();
+    if (checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION)
+        != PackageManager.PERMISSION_GRANTED)
+      Store.prefs(this)
+          .edit()
+          .remove("counter")
+          .remove("counterTimestamp")
+          .putBoolean("tracking", false)
+          .apply();
+    if (billing != null) billing.start();
+    startSteps();
+    if (!Store.prefs(this).getBoolean("activityPrompted", false)
+        && ((android.hardware.SensorManager) getSystemService(SENSOR_SERVICE))
+                .getDefaultSensor(android.hardware.Sensor.TYPE_STEP_COUNTER)
+            != null
+        && checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION)
+            != PackageManager.PERMISSION_GRANTED) {
+      Store.prefs(this).edit().putBoolean("activityPrompted", true).apply();
+      requestPermissions(
+          Build.VERSION.SDK_INT >= 33
+              ? new String[] {
+                android.Manifest.permission.ACTIVITY_RECOGNITION,
+                android.Manifest.permission.POST_NOTIFICATIONS
+              }
+              : new String[] {android.Manifest.permission.ACTIVITY_RECOGNITION},
+          1);
+    }
     if (!unlocked) authenticate(false);
     else {
       js("refresh()");
@@ -209,6 +239,10 @@ public class MainActivity extends Activity {
 
   private void startWorkout(String action, String label) {
     if (!unlocked) return;
+    if ((action.equals("start") || action.equals("resume")) && !ProBilling.access(this)) {
+      js("showPro()");
+      return;
+    }
     if (!java.util.Arrays.asList("start", "resume", "pause", "finish").contains(action)) return;
     if (action.equals("finish")) {
       startService(new Intent(this, WorkoutService.class).setAction(action));
@@ -241,6 +275,10 @@ public class MainActivity extends Activity {
 
   private void report(String format) {
     if (!unlocked) return;
+    if (format.equals("pdf") && !ProBilling.access(this)) {
+      js("showPro()");
+      return;
+    }
     if (!java.util.Arrays.asList("csv", "pdf").contains(format)) return;
     toast("Preparing your " + format.toUpperCase() + " report…");
     worker.execute(
@@ -274,6 +312,10 @@ public class MainActivity extends Activity {
   }
 
   void startSteps() {
+    if (StepService.running) return;
+    if (((android.hardware.SensorManager) getSystemService(SENSOR_SERVICE))
+            .getDefaultSensor(android.hardware.Sensor.TYPE_STEP_COUNTER)
+        == null) return;
     if (checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION)
         == PackageManager.PERMISSION_GRANTED)
       startForegroundService(new Intent(this, StepService.class));
@@ -301,7 +343,7 @@ public class MainActivity extends Activity {
     public String state() {
       if (!unlocked) return "{}";
       try {
-        return Store.snapshot(MainActivity.this).toString();
+        return Store.snapshot(MainActivity.this).put("pro", billing.snapshot()).toString();
       } catch (Exception e) {
         return "{}";
       }
@@ -314,7 +356,7 @@ public class MainActivity extends Activity {
         try {
           JSONObject e = new JSONObject(raw), d = Store.data(MainActivity.this);
           String type = e.getString("type");
-          if (!java.util.Set.of(
+          if (!java.util.Arrays.asList(
                   "water",
                   "weight",
                   "sleep",
@@ -412,16 +454,6 @@ public class MainActivity extends Activity {
       runOnUiThread(
           () -> {
             if (!unlocked) return;
-            if (!enabled) {
-              Store.prefs(MainActivity.this)
-                  .edit()
-                  .putBoolean("tracking", false)
-                  .remove("counter")
-                  .commit();
-              stopService(new Intent(MainActivity.this, StepService.class));
-              StepWidget.update(MainActivity.this);
-              return;
-            }
             if (checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION)
                 != PackageManager.PERMISSION_GRANTED) {
               java.util.ArrayList<String> p = new java.util.ArrayList<>();
@@ -591,6 +623,10 @@ public class MainActivity extends Activity {
 
     @JavascriptInterface
     public void scan() {
+      if (!ProBilling.access(MainActivity.this)) {
+        js("showPro()");
+        return;
+      }
       runOnUiThread(
           () -> {
             if (!unlocked) return;
@@ -609,6 +645,10 @@ public class MainActivity extends Activity {
     @JavascriptInterface
     public void lookup(String barcode) {
       if (!unlocked) return;
+      if (!ProBilling.access(MainActivity.this)) {
+        js("showPro()");
+        return;
+      }
       worker.execute(
           () -> {
             try {
@@ -641,6 +681,84 @@ public class MainActivity extends Activity {
             else HealthSync.sync(MainActivity.this);
           });
     }
+
+    @JavascriptInterface
+    public void buyPro() {
+      runOnUiThread(
+          () -> {
+            if (unlocked) billing.buy();
+          });
+    }
+
+    @JavascriptInterface
+    public void restorePro() {
+      runOnUiThread(
+          () -> {
+            if (unlocked) billing.start();
+          });
+    }
+
+    @JavascriptInterface
+    public void privacy() {
+      runOnUiThread(
+          () -> {
+            if (unlocked) startActivity(new Intent(MainActivity.this, PrivacyActivity.class));
+          });
+    }
+
+    @JavascriptInterface
+    public void deleteData() {
+      runOnUiThread(
+          () -> {
+            if (!unlocked) return;
+            new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Delete all health data?")
+                .setMessage(
+                    "This removes your journal, step history, saved routes, profile and reminders"
+                        + " from this phone. Export a backup first. Your Pro purchase and Android"
+                        + " permissions are kept.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton(
+                    "Delete data",
+                    (dialog, which) -> {
+                      if (!unlocked) return;
+                      synchronized (Store.class) {
+                        JSONArray entries = Store.data(MainActivity.this).optJSONArray("entries");
+                        for (int n = 0; n < entries.length(); n++)
+                          ReminderReceiver.cancel(
+                              MainActivity.this, entries.optJSONObject(n).optString("id"));
+                        stopService(new Intent(MainActivity.this, WorkoutService.class));
+                        SharedPreferences.Editor editor = Store.prefs(MainActivity.this).edit();
+                        for (String key : Store.prefs(MainActivity.this).getAll().keySet())
+                          if (key.startsWith("steps:")
+                              || key.startsWith("importSteps:")
+                              || key.startsWith("food:")
+                              || java.util.Arrays.asList(
+                                      "data",
+                                      "counter",
+                                      "counterTimestamp",
+                                      "workout",
+                                      "deletedHealth",
+                                      "lastSync",
+                                      "syncStatus",
+                                      "gpsStatus")
+                                  .contains(key)) editor.remove(key);
+                        editor.putBoolean("hydration", false).commit();
+                        ReminderReceiver.schedule(MainActivity.this);
+                        DailyBoundaryReceiver.refresh(MainActivity.this);
+                        js("refresh()");
+                        toast("Health data deleted");
+                      }
+                    })
+                .show();
+          });
+    }
+  }
+
+  protected void onDestroy() {
+    if (billing != null) billing.close();
+    worker.shutdownNow();
+    super.onDestroy();
   }
 
   private void applySystemTheme(String value) {

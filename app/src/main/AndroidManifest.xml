@@ -21,7 +21,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
     <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
-    <application android:label="My Health" android:icon="@drawable/ic_health" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:dataExtractionRules="@xml/data_extraction_rules" android:supportsRtl="true" android:usesCleartextTraffic="false">
+    <application android:label="My Health" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:fullBackupContent="false" android:dataExtractionRules="@xml/data_extraction_rules" android:supportsRtl="true" android:usesCleartextTraffic="false">
         <activity android:name=".MainActivity" android:exported="true" android:windowSoftInputMode="adjustResize">
             <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
         </activity>
@@ -36,6 +36,7 @@
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/step_widget" />
         </receiver>
         <receiver android:name=".ReminderReceiver" android:exported="false" />
-        <receiver android:name=".BootReceiver" android:exported="true"><intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter></receiver>
+        <receiver android:name=".DailyBoundaryReceiver" android:exported="false"><intent-filter><action android:name="android.intent.action.DATE_CHANGED"/><action android:name="android.intent.action.TIME_SET"/><action android:name="android.intent.action.TIMEZONE_CHANGED"/><action android:name="android.intent.action.USER_PRESENT"/></intent-filter></receiver>
+        <receiver android:name=".BootReceiver" android:exported="true"><intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /><action android:name="android.intent.action.MY_PACKAGE_REPLACED" /></intent-filter></receiver>
     </application>
 </manifest>

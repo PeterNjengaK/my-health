@@ -19,7 +19,7 @@ final class Store {
           prefs(c)
               .getString(
                   "data",
-                  "{\"entries\":[],\"goals\":{\"steps\":8000,\"water\":2000,\"sleep\":8},\"name\":\"Peter\",\"stride\":0.7}"));
+                  "{\"entries\":[],\"goals\":{\"steps\":8000,\"water\":2000,\"sleep\":8},\"name\":\"\",\"stride\":0.7}"));
     } catch (JSONException e) {
       throw new IllegalStateException(e);
     }
@@ -43,6 +43,9 @@ final class Store {
     d.put("steps", steps);
     d.put("today", today());
     d.put("tracking", prefs(c).getBoolean("tracking", false));
+    d.put("automaticSteps", true);
+    d.put("version", BuildConfig.VERSION_NAME);
+    d.put("pro", ProBilling.state(c));
     d.put(
         "permission",
         c.checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION)

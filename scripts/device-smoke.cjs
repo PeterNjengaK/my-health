@@ -31,7 +31,7 @@ const fs = require('node:fs'),
       setTimeout(() => {
         if (pending.has(key)) {
           pending.delete(key);
-          reject(new Error('CDP timeout'));
+          reject(new Error('CDP timeout: ' + method));
         }
       }, 10000).unref();
     });
@@ -161,14 +161,43 @@ const fs = require('node:fs'),
     await evalJS('reportDays=90;render()');
     assert.equal(await evalJS('document.querySelectorAll(".heat").length'), 90);
     await evalJS('reportDays=30;render()');
+    assert.equal(await evalJS('state.automaticSteps'), true, 'automatic daily mode enabled');
+    await evalJS('go("settings")');
+    assert((await evalJS('document.body.innerText')).includes('Automatic daily steps'));
+    assert(
+      !(await evalJS('document.body.innerText')).includes('Pause'),
+      'no manual step pause switch',
+    );
+    await evalJS('showPro()');
+    assert.equal(
+      await evalJS('document.querySelector("[data-action=buy-pro]").disabled'),
+      true,
+      'unconfigured purchase cannot charge',
+    );
+    await evalJS('close()');
+    const proBefore = await evalJS('JSON.stringify(state.pro)');
+    await evalJS('state.pro={access:false,configured:false};reportDays=90;go("insights")');
+    assert.equal(
+      await evalJS('document.querySelectorAll(".heat").length'),
+      7,
+      'free edition retains seven-day view',
+    );
+    await evalJS('go("home");document.querySelector("[data-action=scan-food]").click()');
+    assert(
+      (await evalJS('document.querySelector("#sheet").innerText')).includes('My Health Pro'),
+      'Pro gate shows upgrade without opening camera',
+    );
+    await evalJS(`state.pro=${proBefore};reportDays=30;close()`);
     await evalJS('refresh();go("home")');
     assert.equal(await evalJS('window.scrollY'), 0);
     assert.equal(errors.length, 0, 'no JavaScript exceptions');
-    const shot = await call('Page.captureScreenshot', { format: 'png' });
-    fs.mkdirSync('artifacts', { recursive: true });
-    fs.writeFileSync('artifacts/device-home.png', Buffer.from(shot.data, 'base64'));
+    if (process.argv.includes('--screenshot')) {
+      const shot = await call('Page.captureScreenshot', { format: 'png' });
+      fs.mkdirSync('artifacts', { recursive: true });
+      fs.writeFileSync('artifacts/device-home.png', Buffer.from(shot.data, 'base64'));
+    }
     console.log(
-      'PASS: five screens, fourteen forms, native saves/edits/deletes, atomic validation, dark/light themes, barcode portions, GPS controls, 30/90-day trends, escaping and runtime checks.',
+      'PASS: five screens, fourteen forms, saves/edits/deletes, automatic tracking UI, themes, barcode portions, GPS controls, trends, Pro gating, disabled unconfigured purchases and runtime checks.',
     );
   } finally {
     for (const entryId of testIds) await evalJS(`Health.delete(${JSON.stringify(entryId)})`);
