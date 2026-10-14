@@ -1,0 +1,12 @@
+.unit-options { display:grid; grid-template-columns:1fr 1.5fr; gap:12px; align-items:center; }
+.unit-options label { margin:0; }
+.unit-options select { margin:0; }
+.setup-banner { width:100%; padding:16px; margin:0 0 20px; border-radius:18px; background:var(--card); color:var(--ink); border:1px solid var(--line); text-align:left; font-weight:600; }
+.progress-summary { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.progress-summary strong { display:block; font-size:26px; margin:8px 0; }
+.progress-summary small { font-size:13px; font-weight:400; }
+.day-list button { display:flex; width:100%; justify-content:space-between; gap:12px; padding:15px 0; background:none; color:inherit; border:0; border-bottom:1px solid var(--line); text-align:left; }
+.day-list button:last-child { border-bottom:0; }
+.heatmap button.heat { border:0; color:inherit; font:inherit; cursor:pointer; }
+:focus-visible { outline:2px solid var(--muted); outline-offset:3px; }
+@media(max-width:350px) { .progress-summary {grid-template-columns:1fr;} }

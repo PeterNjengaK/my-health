@@ -445,6 +445,7 @@ public class MainActivity extends Activity {
           d.put("weightUnit", wu);
           d.put("distanceUnit", du);
           d.put("bodyWeightKg", bw);
+          if (next.has("setupComplete")) d.put("setupComplete", next.getBoolean("setupComplete"));
           d.put("goals", goals);
           d.put("name", next.getString("name"));
           d.put("stride", next.getDouble("stride"));

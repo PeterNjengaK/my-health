@@ -17,7 +17,7 @@
     ids.push(...updated.entries.filter(e => !original.entries.some(o => o.id === e.id)).map(e => e.id));
     state = updated;
     check(rows([state.entries.find(e => e.id === ids[0])]).includes('176.4'), 'Display pounds');
-    check(home().includes('Daily calories burned'), 'Daily calorie card');
+    check(home().includes('Walking calories today'), 'Daily calorie card');
     check(home().includes('mi · estimated'), 'Home distance unit');
     check(activity().includes('estimated mi'), 'Weekly distance unit');
     add('weight');

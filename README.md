@@ -110,7 +110,13 @@ Set `PLAY_BILLING_PUBLIC_KEY`, `PRIVACY_POLICY_URL`, `SUPPORT_EMAIL`, and `PUBLI
 `app/src/main/java/com/peter/myhealth/` contains Android integrations, validation and step math. `app/src/main/assets/` contains the offline interface and v2 UI. `tests/`, `app/src/androidTest/` and `scripts/` contain repeatable checks. Build outputs, local SDK configuration, screenshots, backups, reports and signing keys are excluded from Git.
 
 Implementation references: [Android Health Connect platform API](https://developer.android.com/reference/android/health/connect/HealthConnectManager), [ZXing Android Embedded](https://github.com/journeyapps/zxing-android-embedded), and [Open Food Facts API](https://openfoodfacts.github.io/openfoodfacts-server/api/). Nutrition data is attributed to Open Food Facts in the app; its database is available under ODbL.
-# Version 2.2 additions
+## Version 2.3 polish
+
+New installs get guided setup for name, independent kg/lbs and km/miles units, step goal and optional body weight. Existing profiles keep their data and can open setup from the home banner or You screen. Measurement selectors are directly visible on You and save immediately.
+
+Daily detail sheets open from Activity or the Insights calendar. Goal streaks use the current step goal; weekly comparisons use the last seven calendar days versus the previous seven. Journal search covers category, label, notes, value and date. Tracking status distinguishes missing sensor, missing activity access, stopped service and running service. Android force-stop or revoked permission can still interrupt tracking.
+
+## Version 2.2 additions
 
 Choose kg or lbs and km or miles under **You → Daily goals & profile**. Preferences apply to weight entries, trends, step distance, GPS distance, pace and route previews; underlying records keep kg/km for consistent backups and exports. Names are entered locally, never inferred from the phone owner.
 

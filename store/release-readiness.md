@@ -1,4 +1,4 @@
-# Release status — My Health 2.1
+# Release status — My Health 2.3
 
 ## Prepared and validated locally
 
