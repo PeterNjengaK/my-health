@@ -3,6 +3,15 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 Add-Type -AssemblyName System.Security
 $privateDirectory = Join-Path $projectRoot '.release'
+$originalBillingKey = $env:PLAY_BILLING_PUBLIC_KEY
+$billingKeyFile = Join-Path $privateDirectory 'play-billing-public-key.txt'
+if ([string]::IsNullOrWhiteSpace($env:PLAY_BILLING_PUBLIC_KEY) -and (Test-Path -LiteralPath $billingKeyFile)) {
+  $env:PLAY_BILLING_PUBLIC_KEY = ([IO.File]::ReadAllText($billingKeyFile) -replace '\s','')
+}
+if (-not [string]::IsNullOrWhiteSpace($env:PLAY_BILLING_PUBLIC_KEY)) {
+  try { $keyBytes = [Convert]::FromBase64String($env:PLAY_BILLING_PUBLIC_KEY) } catch { throw 'The Play public licensing key is not valid Base64.' }
+  if ($keyBytes.Length -lt 256 -or $keyBytes[0] -ne 48) { throw 'The Play public licensing key does not look like a DER RSA public key.' }
+}
 $encrypted = [IO.File]::ReadAllBytes((Join-Path $privateDirectory 'password.dpapi'))
 $secretBytes = [Security.Cryptography.ProtectedData]::Unprotect($encrypted,$null,[Security.Cryptography.DataProtectionScope]::CurrentUser)
 $env:MY_HEALTH_STORE_PASSWORD = [Text.Encoding]::UTF8.GetString($secretBytes)
@@ -22,5 +31,6 @@ try {
 } finally {
   if ((Get-Location).Path -eq $projectRoot) { Pop-Location }
   Remove-Item Env:\MY_HEALTH_STORE_PASSWORD,Env:\MY_HEALTH_KEY_PASSWORD -ErrorAction SilentlyContinue
+  $env:PLAY_BILLING_PUBLIC_KEY = $originalBillingKey
   [Array]::Clear($secretBytes,0,$secretBytes.Length)
 }
