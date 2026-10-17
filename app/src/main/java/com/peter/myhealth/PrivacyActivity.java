@@ -40,6 +40,9 @@ public class PrivacyActivity extends Activity {
             + "My Health is a personal wellness journal, not a medical device. It does not"
             + " diagnose, prevent, cure or treat medical conditions. Consult a qualified healthcare"
             + " professional for medical advice."
+            + (BuildConfig.PRIVACY_POLICY_URL.isEmpty()
+                ? ""
+                : "\n\nFull public privacy policy:\n" + BuildConfig.PRIVACY_POLICY_URL)
             + (BuildConfig.SUPPORT_EMAIL.isEmpty()
                 ? ""
                 : "\n\nPrivacy/support contact: " + BuildConfig.SUPPORT_EMAIL));

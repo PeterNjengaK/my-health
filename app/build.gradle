@@ -8,9 +8,10 @@ android {
     namespace 'com.peter.myhealth'
     compileSdk 36
     defaultConfig {
-        applicationId 'com.peter.myhealth'; minSdk 29; targetSdk 36; versionCode 6; versionName '2.3.1'
+        applicationId 'com.peter.myhealth'; minSdk 29; targetSdk 36; versionCode 7; versionName '2.3.2'
         testInstrumentationRunner 'com.peter.myhealth.IntegrationChecks'
         buildConfigField 'String', 'PLAY_BILLING_PUBLIC_KEY', javaString(configValue('PLAY_BILLING_PUBLIC_KEY'))
+        buildConfigField 'String', 'REVIEW_ACCESS_PUBLIC_KEY', javaString(configValue('REVIEW_ACCESS_PUBLIC_KEY'))
         buildConfigField 'String', 'PRIVACY_POLICY_URL', javaString(configValue('PRIVACY_POLICY_URL'))
         buildConfigField 'String', 'SUPPORT_EMAIL', javaString(configValue('SUPPORT_EMAIL'))
         buildConfigField 'String', 'PUBLIC_DEVELOPER_NAME', javaString(configValue('PUBLIC_DEVELOPER_NAME'))

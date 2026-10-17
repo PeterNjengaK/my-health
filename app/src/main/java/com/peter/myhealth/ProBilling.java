@@ -38,7 +38,12 @@ final class ProBilling implements PurchasesUpdatedListener {
   }
 
   static boolean access(Context c) {
-    return BuildConfig.DEBUG || owns(c);
+    return BuildConfig.DEBUG || owns(c) || reviewer(c);
+  }
+
+  static boolean reviewer(Context c) {
+    return ReviewAccessVerifier.verify(BuildConfig.REVIEW_ACCESS_PUBLIC_KEY,
+        prefs(c).getString("reviewAccess", ""));
   }
 
   static JSONObject state(Context c) throws JSONException {
@@ -46,6 +51,7 @@ final class ProBilling implements PurchasesUpdatedListener {
         .put("owned", owns(c))
         .put("access", access(c))
         .put("preview", BuildConfig.DEBUG)
+        .put("reviewer", reviewer(c))
         .put("configured", !BuildConfig.PLAY_BILLING_PUBLIC_KEY.trim().isEmpty());
   }
 

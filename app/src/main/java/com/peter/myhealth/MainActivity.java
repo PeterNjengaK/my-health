@@ -700,6 +700,16 @@ public class MainActivity extends Activity {
     }
 
     @JavascriptInterface
+    public String reviewAccess(String code) {
+      if (!unlocked) return "Unlock the app first";
+      if (!ReviewAccessVerifier.verify(BuildConfig.REVIEW_ACCESS_PUBLIC_KEY, code))
+        return "Review access code is not valid";
+      if (!ProBilling.prefs(MainActivity.this).edit().putString("reviewAccess", code.replaceAll("\\s", "")).commit())
+        return "Could not save review access. Try again.";
+      return "";
+    }
+
+    @JavascriptInterface
     public void restorePro() {
       runOnUiThread(
           () -> {
